@@ -31,7 +31,7 @@ jobs:
         run: |
           IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$(date +%Y%m%d%H%M%S)
           echo "IMAGE=$IMAGE" >> $GITHUB_ENV
-          docker build -t $IMAGE -f backend/Dockerfile backend
+          docker build -t $IMAGE -f Dockerfile backend
           docker push $IMAGE
 
       - name: Update Helm values with new image
