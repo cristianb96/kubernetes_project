@@ -10,8 +10,11 @@ env:
   IMAGE_NAME: ${{ github.repository }}-backend
 
 jobs:
-  build-and-deploy:
+  build-and-push:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout repository
@@ -27,22 +30,24 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and Push Docker image
-        run: |
-          IMAGE=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:$(date +%Y%m%d%H%M%S)
-          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
-          docker build -t $IMAGE -f Dockerfile backend
-          docker push $IMAGE
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
 
-      - name: Update Helm values with new image
-        run: |
-          sed -i "s|repository:.*|repository: $(echo $IMAGE | cut -d: -f1)|" charts/pedido-app/values.yaml
-          sed -i "s|tag:.*|tag: $(echo $IMAGE | cut -d: -f2)|" charts/pedido-app/values.yaml
-
-      - name: Commit and push Helm chart update
-        run: |
-          git config --global user.email "actions@github.com"
-          git config --global user.name "github-actions"
-          git add charts/pedido-app/values.yaml
-          git commit -m "Update backend image to $IMAGE" || echo "No changes to commit"
-          git push
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./backend/Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
