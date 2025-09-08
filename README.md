@@ -21,7 +21,7 @@ Este repositorio contiene:
 
 2. (Opcional) Construye y publica tu imagen del backend:
    ```bash
-   cd ../../sample-backend
+   cd ../../backend
    docker build -t YOUR_REGISTRY/pedido-backend:v0.1.0 .
    docker push YOUR_REGISTRY/pedido-backend:v0.1.0
    ```
