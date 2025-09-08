@@ -1,0 +1,40 @@
+name: Deploy Backend with Helm + ArgoCD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      - name: Build and push Docker image
+        run: |
+          IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/pedido-backend:$(date +%Y%m%d%H%M%S)
+          echo "IMAGE=$IMAGE" >> $GITHUB_ENV
+          docker build -t $IMAGE -f backend/Dockerfile backend
+          docker push $IMAGE
+
+      - name: Update Helm values with new image
+        run: |
+          sed -i "s|repository:.*|repository: $(echo $IMAGE | cut -d: -f1)|" charts/pedido-app/values.yaml
+          sed -i "s|tag:.*|tag: $(echo $IMAGE | cut -d: -f2)|" charts/pedido-app/values.yaml
+
+      - name: Commit and push Helm chart update
+        run: |
+          git config --global user.email "actions@github.com"
+          git config --global user.name "github-actions"
+          git add charts/pedido-app/values.yaml
+          git commit -m "Update image to $IMAGE" || echo "No changes to commit"
+          git push

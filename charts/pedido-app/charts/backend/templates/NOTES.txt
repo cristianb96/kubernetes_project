@@ -1,0 +1,5 @@
+1. Servicio del backend:
+   kubectl get svc -n {{ .Release.Namespace }} {{ include "backend.fullname" . }}
+
+2. HTTP health:
+   curl -i http://<INGRESS_HOST>/api/health

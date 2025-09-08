@@ -1,0 +1,29 @@
+image:
+  repository: YOUR_REGISTRY/pedido-backend
+  tag: "v0.1.0"
+  pullPolicy: IfNotPresent
+
+replicas: 1
+
+service:
+  type: ClusterIP
+  port: 8000
+
+ingress:
+  enabled: false
+  className: ""
+  hosts: []
+  tls: []
+
+resources: {}
+
+env:
+  db:
+    host: "db-postgresql"
+    port: 5432
+    database: "pedido"
+    user: "pedido_user"
+    password: "pedido_password"
+
+# Puedes añadir env extra no sensibles aquí
+extraEnv: []

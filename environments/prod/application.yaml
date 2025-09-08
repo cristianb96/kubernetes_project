@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: pedido-app
+  namespace: argocd
+spec:
+  project: my-tech
+  source:
+    repoURL: https://YOUR_GIT_PROVIDER/YOUR_ORG/pedido-app.git
+    targetRevision: main
+    path: charts/pedido-app
+    helm:
+      valueFiles:
+        - values.yaml
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: my-tech
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

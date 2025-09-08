@@ -1,0 +1,19 @@
+apiVersion: v2
+name: pedido-app
+description: Umbrella chart (backend + PostgreSQL) for Pedido App
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+dependencies:
+  # Subchart local: backend
+  - name: backend
+    version: 0.1.0
+    repository: "file://charts/backend"
+    condition: backend.enabled
+
+  # Subchart remoto: Bitnami PostgreSQL (alias 'db')
+  - name: postgresql
+    alias: db
+    version: 16.7.27
+    repository: https://charts.bitnami.com/bitnami
+    condition: db.enabled

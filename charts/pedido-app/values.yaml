@@ -1,0 +1,69 @@
+# =========================
+# Valores del umbrella
+# =========================
+
+# --- Backend subchart ---
+backend:
+  enabled: true
+  image:
+    repository: YOUR_REGISTRY/pedido-backend
+    tag: "v0.1.0"
+    pullPolicy: IfNotPresent
+  replicas: 1
+
+  service:
+    type: ClusterIP
+    port: 8000
+
+  ingress:
+    enabled: true
+    className: nginx
+    hosts:
+      - host: my-tech.local
+        paths:
+          - path: /api
+            pathType: Prefix
+    tls: []
+
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "128Mi"
+    limits:
+      cpu: "500m"
+      memory: "512Mi"
+
+  env:
+    db:
+      # Dejamos el host por defecto al servicio generado por el subchart de Bitnami con fullnameOverride 'db'
+      host: "db-postgresql"
+      port: 5432
+      database: "pedido"
+      user: "pedido_user"
+      password: "pedido_password"
+
+# --- PostgreSQL subchart (Bitnami) ---
+db:
+  enabled: true
+
+  # Nombre fijo para evitar dudas de DNS: los servicios quedarán como 'db-postgresql' (y headless según el chart)
+  fullnameOverride: "db"
+
+  auth:
+    username: "pedido_user"
+    password: "pedido_password"
+    database: "pedido"
+    postgresPassword: "postgres_admin_pwd"
+
+  primary:
+    persistence:
+      enabled: true
+      size: 8Gi
+      # storageClass: ""   # descomenta y pon tu StorageClass si es necesario
+    resources:
+      requests:
+        cpu: "100m"
+        memory: "256Mi"
+      limits:
+        cpu: "500m"
+        memory: "512Mi"
