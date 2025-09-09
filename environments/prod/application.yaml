@@ -6,7 +6,7 @@ metadata:
 spec:
   project: my-tech
   source:
-    repoURL: https://YOUR_GIT_PROVIDER/YOUR_ORG/pedido-app.git
+    repoURL: https://github.com/cristianb96/kubernetes_project.git
     targetRevision: main
     path: charts/pedido-app
     helm:
