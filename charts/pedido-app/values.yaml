@@ -6,8 +6,8 @@
 backend:
   enabled: true
   image:
-    repository: YOUR_REGISTRY/pedido-backend
-    tag: "v0.1.0"
+    repository: ghcr.io/cristianb96/kubernetes_project-backend
+    tag: latest
     pullPolicy: IfNotPresent
   replicas: 1
 
