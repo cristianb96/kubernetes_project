@@ -15,6 +15,13 @@ ingress:
   hosts: []
   tls: []
 
+hpa:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 5
+  cpu:
+    targetAverageUtilization: 70
+
 resources: {}
 
 env:
