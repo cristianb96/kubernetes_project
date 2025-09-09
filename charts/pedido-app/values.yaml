@@ -35,7 +35,6 @@ backend:
 
   env:
     db:
-      # Dejamos el host por defecto al servicio generado por el subchart de Bitnami con fullnameOverride 'db'
       host: "db-postgresql"
       port: 5432
       database: "pedido"
@@ -45,8 +44,6 @@ backend:
 # --- PostgreSQL subchart (Bitnami) ---
 db:
   enabled: true
-
-  # Nombre fijo para evitar dudas de DNS: los servicios quedarán como 'db-postgresql' (y headless según el chart)
   fullnameOverride: "db"
 
   auth:
@@ -59,7 +56,6 @@ db:
     persistence:
       enabled: true
       size: 8Gi
-      # storageClass: ""   # descomenta y pon tu StorageClass si es necesario
     resources:
       requests:
         cpu: "100m"
