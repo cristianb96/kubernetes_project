@@ -10,9 +10,13 @@ service:
   port: 8000
 
 ingress:
-  enabled: false
-  className: ""
-  hosts: []
+  enabled: true
+  className: nginx
+  hosts:
+    - host: my-tech.local
+      paths:
+        - path: /api
+          pathType: Prefix
   tls: []
 
 hpa:
