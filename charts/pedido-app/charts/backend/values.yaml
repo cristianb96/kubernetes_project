@@ -36,5 +36,4 @@ env:
     user: "pedido_user"
     password: "pedido_password"
 
-# Puedes añadir env extra no sensibles aquí
 extraEnv: []
