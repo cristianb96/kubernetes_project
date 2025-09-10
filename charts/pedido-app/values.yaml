@@ -35,7 +35,7 @@ backend:
 
   env:
     db:
-      host: "db-postgresql"
+      host: "db"
       port: 5432
       database: "pedido"
       user: "pedido_user"
