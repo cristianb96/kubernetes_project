@@ -53,6 +53,10 @@ GitHub Push → Jenkins Pipeline → Docker Registry → ArgoCD → Kubernetes
    kubectl get pods -n my-tech
    kubectl get svc,ing -n my-tech
    ```
+   ```bash
+   minikube addons enable ingress
+   ```
+
 
 4. Si usas NGINX Ingress Controller y definiste un host DNS (ej: `my-tech.local`), accede a `http(s)://my-tech.local/api/health`.
 
@@ -61,7 +65,14 @@ GitHub Push → Jenkins Pipeline → Docker Registry → ArgoCD → Kubernetes
 1. Sube este repo a tu Git (GitHub/GitLab/etc.).
 
 2. Aplica los manifiestos (ajusta `repoURL` en `environments/prod/application.yaml`):
-
+    
+    ```bash
+    kubectl create ns argocd
+    kubectl apply -n argocd -f https://raw.githubusercontent.com/argoproj/argo-cd/v2.5.8/manifests/install.yaml
+    kubectl -n argocd get secret argocd-initial-admin-secret \
+    -o jsonpath="{.data.password}" | base64 -d; echo
+    kubectl port-forward svc/argocd-server -n argocd 8080:443
+    ```
    ```bash
    kubectl apply -n argocd -f environments/prod/appproject.yaml
    kubectl apply -n argocd -f environments/prod/application.yaml
