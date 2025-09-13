@@ -1,7 +1,3 @@
-# =========================
-# Valores del umbrella
-# =========================
-
 # --- Backend subchart ---
 backend:
   enabled: true
