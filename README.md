@@ -1,15 +1,37 @@
-# Pedido App (Helm + ArgoCD)
+# Pedido App - CI/CD Automático con Jenkins + ArgoCD
 
-Este repositorio contiene:
+Este repositorio implementa un flujo completo de CI/CD que detecta automáticamente cambios en endpoints y despliega actualizaciones sin intervención manual.
+
+## 🏗️ Arquitectura
+
+```
+GitHub Push → Jenkins Pipeline → Docker Registry → ArgoCD → Kubernetes
+     ↓              ↓                ↓              ↓           ↓
+  Webhook    Detecta cambios    Build & Push    Auto Sync   Deploy
+```
+
+## 📁 Estructura del Proyecto
 
 - **charts/pedido-app**: Chart de Helm _umbrella_ con dos subcharts:
-  - `db` → dependencia de Bitnami PostgreSQL.
-  - `backend` → Deployment/Service/Ingress/ConfigMap/Secret para el backend en Python.
-- **environments/prod**: Manifiestos de ArgoCD (`AppProject` y `Application`) para el entorno `my-tech`.
-- **backend**: Ejemplo mínimo de backend en FastAPI y su `Dockerfile`.
-- **Jenkinsfile**: Pipeline de ejemplo que construye/pushea la imagen y actualiza el `values.yaml`.
+  - `db` → dependencia de Bitnami PostgreSQL
+  - `backend` → Deployment/Service/Ingress/ConfigMap/Secret para el backend en Python
+- **environments/prod**: Manifiestos de ArgoCD (`AppProject` y `Application`) para el entorno `my-tech`
+- **backend**: Backend en FastAPI con endpoints de ejemplo
+- **Jenkinsfile**: Pipeline inteligente que detecta cambios y despliega automáticamente
+- **scripts/**: Scripts de configuración y verificación
+- **docs/**: Documentación detallada de configuración
 
-> Requisitos previos: `kubectl`, `helm` v3, un clúster Kubernetes, **ArgoCD** instalado, y un **Ingress Controller** (por ejemplo NGINX).
+## 🚀 Características Principales
+
+- ✅ **Detección automática** de cambios en endpoints
+- ✅ **Build automático** de imágenes Docker
+- ✅ **Actualización automática** de tags en Helm
+- ✅ **Despliegue automático** con ArgoCD
+- ✅ **Verificación automática** del deployment
+- ✅ **Sin comandos manuales** necesarios
+- ✅ **Trazabilidad completa** del proceso
+
+> Requisitos previos: `kubectl`, `helm` v3, un clúster Kubernetes, **ArgoCD** instalado, **Jenkins** configurado, y un **Ingress Controller** (por ejemplo NGINX).
 
 ## Paso a paso (local / prueba rápida con Helm)
 
@@ -47,9 +69,53 @@ Este repositorio contiene:
 
 3. ArgoCD sincronizará automáticamente (tiene `syncPolicy.automated`). Cada cambio en `charts/pedido-app/values.yaml` (por ejemplo cambiando `backend.image.tag`) provocará una nueva sincronización.
 
-## Jenkins (ejemplo)
+## 🔧 Configuración Rápida
 
-El `Jenkinsfile` crea una imagen con tag del `GIT_COMMIT`, actualiza `charts/pedido-app/values.yaml` y hace `git push`. ArgoCD detectará el cambio y desplegará.
+### 1. Configurar Jenkins + ArgoCD
+
+Sigue la guía detallada en [docs/JENKINS_ARGOCD_SETUP.md](docs/JENKINS_ARGOCD_SETUP.md)
+
+### 2. Configurar Webhook de GitHub
+
+```bash
+# Hacer ejecutable
+chmod +x scripts/setup-github-webhook.sh
+
+# Configurar variables
+export JENKINS_URL="http://tu-jenkins-url:8080"
+export GITHUB_REPO="cristianb96/kubernetes_project"
+export GITHUB_TOKEN="tu_github_token"
+
+# Ejecutar configuración
+./scripts/setup-github-webhook.sh
+```
+
+### 3. Probar el Flujo Completo
+
+```bash
+# Ejecutar script de prueba
+./scripts/test-endpoint-changes.sh
+
+# Verificar deployment
+./scripts/verify-argocd-sync.sh
+```
+
+## 🧪 Cómo Funciona
+
+### Cuando agregas o modificas un endpoint:
+
+1. **Editas** `backend/main.py` (ej: agregar `@app.get("/api/nuevo")`)
+2. **Haces commit y push** al repositorio
+3. **GitHub webhook** notifica a Jenkins automáticamente
+4. **Jenkins detecta** cambios en archivos `.py` del backend
+5. **Jenkins construye** nueva imagen Docker con tag único
+6. **Jenkins actualiza** `values.yaml` con el nuevo tag
+7. **Jenkins hace commit** de los cambios y los envía al repo
+8. **ArgoCD detecta** cambios en el repositorio automáticamente
+9. **ArgoCD sincroniza** y despliega la nueva versión
+10. **Verificación automática** confirma que todo funciona
+
+### Sin comandos manuales necesarios! 🎉
 
 ## Notas sobre PostgreSQL (Bitnami)
 

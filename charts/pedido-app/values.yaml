@@ -51,7 +51,7 @@ db:
   primary:
     persistence:
       enabled: true
-      size: 8Gi
+      size: 16Gi
     resources:
       requests:
         cpu: "100m"
