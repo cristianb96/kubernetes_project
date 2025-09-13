@@ -112,20 +112,3 @@ def listar_pedidos():
                 } for row in rows]
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error listando pedidos: {str(e)}")
-
-@app.get("/api/stats")
-def estadisticas():
-    """Estadísticas básicas"""
-    try:
-        with get_db_conn() as conn:
-            with conn.cursor(cursor_factory=RealDictCursor) as cur:
-                cur.execute("SELECT COUNT(*) as total, COALESCE(SUM(total), 0) as valor_total FROM pedidos")
-                row = cur.fetchone()
-                
-                return {
-                    "total_pedidos": row['total'],
-                    "valor_total": float(row['valor_total']),
-                    "mensaje": "Estadísticas actualizadas"
-                }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error obteniendo estadísticas: {str(e)}")
